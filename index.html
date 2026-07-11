@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#294532">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23294532'/%3E%3Cpath d='M15 70 L38 35 L52 55 L65 30 L88 70 Z' fill='%23C1592C'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23294532'/%3E%3Cpath d='M15 70 L38 35 L52 55 L65 30 L88 70 Z' fill='%23C1592C'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <title>Ruta a Rumanía</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -184,6 +184,15 @@
 </div>
 
 <script>
+// Registrar Service Worker PRIMERO
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registered:', reg))
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+
 // Polyfill para navegadores que no tienen IndexedDB
 window.storage = {
   async get(key) {
@@ -514,11 +523,6 @@ document.querySelectorAll('nav.tabbar button').forEach(btn=>{
 const t0 = todayISO();
 const currentSession = sessions.find(s=>s.date>=t0);
 if(currentSession) openWeek = currentSession.week; else openWeek = 6;
-
-// Registrar Service Worker
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js').catch(err=>console.log('SW registration failed:', err));
-}
 
 loadState();
 </script>
