@@ -1,0 +1,45 @@
+{
+  "name": "Ruta a Rumanía",
+  "short_name": "Rumanía",
+  "description": "Plan de entrenamiento 6 semanas para la ruta a Rumanía",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F1EBDD",
+  "theme_color": "#294532",
+  "categories": ["fitness", "productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23294532'/%3E%3Cpath d='M15 120 L60 60 L95 100 L130 40 L170 120 Z' fill='%23C1592C'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23294532'/%3E%3Cpath d='M40 320 L160 90 L250 210 L340 70 L460 320 Z' fill='%23C1592C'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23294532'/%3E%3Cpath d='M15 120 L60 60 L95 100 L130 40 L170 120 Z' fill='%23C1592C'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23294532'/%3E%3Cpath d='M40 320 L160 90 L250 210 L340 70 L460 320 Z' fill='%23C1592C'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23294532' rx='45'/%3E%3Cpath d='M15 120 L60 60 L95 100 L130 40 L170 120 Z' fill='%23C1592C'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
