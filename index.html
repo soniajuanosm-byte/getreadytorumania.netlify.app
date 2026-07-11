@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ruta a Rumanía">
+<meta name="theme-color" content="#294532">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23294532'/%3E%3Cpath d='M15 70 L38 35 L52 55 L65 30 L88 70 Z' fill='%23C1592C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23294532'/%3E%3Cpath d='M15 70 L38 35 L52 55 L65 30 L88 70 Z' fill='%23C1592C'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<title>Ruta a Rumanía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EBDD; --paper-dark:#E6DDC8; --ink:#2A2620;
+    --forest:#3B5D42; --forest-dark:#294532; --rust:#C1592C;
+    --stone:#8B8378; --white:#FBF9F4;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    background:var(--paper); color:var(--ink); font-family:'Source Sans 3', sans-serif;
+    display:flex; justify-content:center;
+  }
+  #app{width:100%; max-width:460px; min-height:100vh; background:var(--paper); display:flex; flex-direction:column; position:relative;}
+
+  /* HEADER */
+  header{
+    background:var(--forest-dark); color:var(--white); padding:18px 18px 16px; position:sticky; top:0; z-index:10;
+  }
+  header .top{display:flex; justify-content:space-between; align-items:center;}
+  header .title{font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:15px; letter-spacing:0.04em;}
+  header .countdown{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--rust); font-weight:600; text-align:right;}
+  header .countdown b{font-size:16px; display:block;}
+  .progress-bar{margin-top:12px; height:6px; background:rgba(255,255,255,0.15); border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--rust); border-radius:3px; transition:width .3s;}
+  .progress-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; margin-top:6px; opacity:0.75;}
+
+  main{flex:1; padding:16px 16px 90px; overflow-y:auto;}
+  section{display:none;}
+  section.active{display:block;}
+
+  /* TODAY CARD */
+  .hero-photo{width:100%; margin-bottom:16px; border:1px solid var(--paper-dark);}
+  .hero-photo img{width:100%; height:170px; object-fit:cover; display:block;}
+  .hero-photo .cap{
+    background:var(--forest-dark); color:var(--paper); font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; padding:6px 10px; opacity:0.85; letter-spacing:0.02em;
+  }
+  .today-card{
+    background:var(--white); border:1px solid var(--paper-dark); border-left:5px solid var(--rust);
+    padding:18px; margin-bottom:16px;
+  }
+  .today-card.rest{border-left-color:var(--stone);}
+  .today-card.done{border-left-color:var(--forest);}
+  .today-eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--rust); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;}
+  .today-card.rest .today-eyebrow{color:var(--stone);}
+  .today-title{font-family:'Oswald',sans-serif; font-size:20px; text-transform:uppercase; color:var(--forest-dark); margin-bottom:8px; line-height:1.15;}
+  .today-meta{display:flex; gap:14px; margin-bottom:10px; flex-wrap:wrap;}
+  .meta-chip{font-family:'JetBrains Mono',monospace; font-size:11.5px; background:var(--paper-dark); padding:4px 9px; border-radius:3px;}
+  .today-notes{font-size:14px; color:var(--ink); opacity:0.8; margin-bottom:14px;}
+  .btn-done{
+    width:100%; padding:13px; border:none; border-radius:4px; font-family:'Oswald',sans-serif;
+    text-transform:uppercase; font-size:14px; letter-spacing:0.03em; background:var(--forest); color:var(--white);
+    cursor:pointer;
+  }
+  .btn-done.on{background:var(--stone);}
+
+  .next-preview{font-size:13px; color:var(--stone); margin-top:4px;}
+  .next-preview b{color:var(--ink);}
+
+  h2.section-title{
+    font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:16px; color:var(--forest-dark);
+    margin:22px 0 10px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px;
+  }
+  h2.section-title .rule{flex:1; height:1px; background:var(--stone); opacity:0.35;}
+
+  /* WEEK ACCORDION */
+  .week{background:var(--white); border:1px solid var(--paper-dark); margin-bottom:10px; overflow:hidden;}
+  .week-head{
+    display:flex; justify-content:space-between; align-items:center; padding:13px 16px; cursor:pointer;
+    background:var(--paper-dark);
+  }
+  .week-head .wname{font-family:'Oswald',sans-serif; font-size:14.5px; text-transform:uppercase; color:var(--forest-dark);}
+  .week-head .wdates{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--stone); display:block; margin-top:2px;}
+  .week-head .wcount{font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--forest); color:var(--white); padding:3px 8px; border-radius:10px;}
+  .week-body{display:none;}
+  .week-body.open{display:block;}
+  .sess{
+    display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-top:1px solid var(--paper-dark);
+  }
+  .sess.done{background:rgba(59,93,66,0.06);}
+  .chk{
+    width:22px; height:22px; border-radius:50%; border:2px solid var(--forest); flex-shrink:0; margin-top:2px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--white);
+  }
+  .chk.on{background:var(--forest);}
+  .chk.on::after{content:'✓'; color:var(--white); font-size:13px; font-weight:700;}
+  .sess-info{flex:1;}
+  .sess-day{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--rust); text-transform:uppercase; letter-spacing:0.04em;}
+  .sess-title{font-size:14px; font-weight:600; margin:2px 0 3px; color:var(--ink);}
+  .sess.done .sess-title{text-decoration:line-through; opacity:0.55;}
+  .sess-sub{font-size:12px; color:var(--stone);}
+  .ex-toggle{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--forest); font-weight:600;
+    margin-top:6px; cursor:pointer; display:inline-block;
+  }
+  .ex-list{margin-top:8px; padding:10px 12px; background:var(--paper); border-radius:4px; border-left:3px solid var(--forest);}
+  .ex-list div{font-size:12.5px; padding:3px 0; color:var(--ink);}
+
+  /* EQUIPO */
+  .equip-item{
+    display:flex; align-items:center; gap:12px; padding:13px 16px; background:var(--white);
+    border:1px solid var(--paper-dark); margin-bottom:8px;
+  }
+  .equip-item .txt{font-size:14px; flex:1;}
+  .equip-item.done .txt{text-decoration:line-through; opacity:0.5;}
+
+  .note-box{background:var(--forest-dark); color:var(--paper); padding:16px 18px; margin-top:16px; font-size:13.5px; border-radius:4px;}
+  .note-box b{color:var(--rust);}
+
+  /* TAB BAR */
+  nav.tabbar{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px;
+    background:var(--white); border-top:1px solid var(--paper-dark); display:flex; z-index:20;
+  }
+  nav.tabbar button{
+    flex:1; background:none; border:none; padding:11px 0 9px; font-family:'Source Sans 3',sans-serif;
+    font-size:11.5px; color:var(--stone); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px;
+  }
+  nav.tabbar button .ic{font-size:19px;}
+  nav.tabbar button.active{color:var(--forest-dark); font-weight:700;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="top">
+      <div class="title">Ruta a Rumanía</div>
+      <div class="countdown"><span id="countdown-num">--</span><b id="countdown-lbl">días</b></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">0 / 24 sesiones completadas</div>
+  </header>
+
+  <main>
+    <section id="view-hoy" class="active">
+      <div class="hero-photo">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Transfagarasan-north.JPG?width=700" alt="Carretera Transfăgărășan, Rumanía">
+        <div class="cap">Transfăgărășan · Munții Făgăraș, Rumanía</div>
+      </div>
+      <div id="today-slot"></div>
+      <h2 class="section-title">Próximas sesiones<div class="rule"></div></h2>
+      <div id="upcoming-slot"></div>
+    </section>
+
+    <section id="view-plan">
+      <div id="weeks-slot"></div>
+    </section>
+
+    <section id="view-equipo">
+      <h2 class="section-title" style="margin-top:4px">Checklist antes de salir<div class="rule"></div></h2>
+      <div id="equip-slot"></div>
+      <div class="note-box">
+        <b>Sobre la báscula y las fotos:</b> este plan está pensado para rendimiento — piernas fuertes, buen fondo, agilidad en bajadas técnicas. Duerme bien, come suficiente proteína y no recortes calorías mientras subes la carga: con más cardio necesitas más combustible, no menos.
+      </div>
+      <div class="note-box" style="margin-top:10px; background:var(--stone);">
+        <b>Sobre los pesos de fuerza:</b> están calculados a partir de tu última sesión registrada, bajados ~20-25% por la vuelta de vacaciones. Súbelos por tu cuenta si un peso te sale claramente fácil (RIR 4+); es solo un punto de partida, no una norma fija.
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button data-view="hoy" class="active"><span class="ic">📍</span>Hoy</button>
+    <button data-view="plan"><span class="ic">🗺️</span>Plan</button>
+    <button data-view="equipo"><span class="ic">🎒</span>Equipo</button>
+  </nav>
+
+</div>
+
+<script>
+// Polyfill para navegadores que no tienen IndexedDB
+window.storage = {
+  async get(key) {
+    if (typeof indexedDB === 'undefined') {
+      const val = localStorage.getItem(key);
+      return val ? { value: val } : null;
+    }
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('rutadb', 1);
+      req.onerror = () => reject(req.error);
+      req.onupgradeneeded = () => req.result.createObjectStore('store');
+      req.onsuccess = () => {
+        const tx = req.result.transaction('store');
+        const get = tx.objectStore('store').get(key);
+        get.onsuccess = () => resolve(get.result);
+        get.onerror = () => reject(get.error);
+      };
+    });
+  },
+  async set(key, value) {
+    localStorage.setItem(key, value);
+    if (typeof indexedDB === 'undefined') return;
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('rutadb', 1);
+      req.onerror = () => reject(req.error);
+      req.onupgradeneeded = () => req.result.createObjectStore('store');
+      req.onsuccess = () => {
+        const tx = req.result.transaction('store', 'readwrite');
+        const put = tx.objectStore('store').put({ value }, key);
+        put.onsuccess = () => resolve();
+        put.onerror = () => reject(put.error);
+      };
+    });
+  }
+};
+
+const TRIP_DATE = "2026-08-22";
+
+const sessions = [
+  {id:1, week:1, date:"2026-07-11", day:"Sáb", title:"Cinta inclinada 10-12%, ritmo caminata firme", dur:"30 min", rpe:"5", notes:"Debes poder hablar con algo de esfuerzo", long:true},
+  {id:2, week:1, date:"2026-07-12", day:"Dom", title:"Fuerza · Día pesado (adaptado)", dur:"45-50 min", rpe:"6", notes:"Pesos bajados ~20-25% por la vuelta de vacaciones",
+    exercises:[
+      "Hip Thrust barra — 1×10 @ 60kg",
+      "Hip Thrust barra — 1×8 @ 55kg",
+      "Hip Thrust barra — 1×8 @ 50kg",
+      "Hip Thrust barra — 1×8 @ 45kg",
+      "Bulgarian Squat mancuerna — 2×8 @ 8kg",
+      "Abductores — 2×15-20 @ 90-100kg",
+      "Face Pulls — 2×15-20 @ 9kg"
+    ]},
+  {id:3, week:1, date:"2026-07-14", day:"Mar", title:"Escaladora 15min + cinta plana 10min suave", dur:"25 min", rpe:"5", notes:"Familiarízate con la máquina"},
+  {id:4, week:1, date:"2026-07-16", day:"Jue", title:"Fuerza (piernas/glúteo) + bici 10min suave", dur:"45 min", rpe:"6", notes:"",
+    exercises:[
+      "Romanian Deadlift — 3×10 @ 20kg",
+      "Curl Femoral — 3×12-15 @ 30-35kg",
+      "Patadas Glúteo (polea) — 2×12-15 @ 15kg",
+      "Press Inclinado Mancuerna — 3×10-12 @ 8kg",
+      "Step Ups — 2×8-10, peso corporal o barra ligera",
+      "Bici Z2 — 10 min suave al final"
+    ]},
+
+  {id:5, week:2, date:"2026-07-18", day:"Sáb", title:"Cinta inclinada 12%, últimos 15min con mochila 4kg", dur:"40 min", rpe:"6", notes:"Botellas de agua sirven de peso", long:true},
+  {id:6, week:2, date:"2026-07-19", day:"Dom", title:"Fuerza · Día pesado (mantenimiento)", dur:"45 min", rpe:"6", notes:"Sube un poco respecto a la semana pasada",
+    exercises:[
+      "Hip Thrust barra — 1×10 @ 65kg",
+      "Hip Thrust barra — 1×8 @ 60kg",
+      "Hip Thrust barra — 1×8 @ 55kg",
+      "Hip Thrust barra — 1×8 @ 50kg",
+      "Bulgarian Squat mancuerna — 2×8 @ 10kg",
+      "Abductores — 2×15-20 @ 100-110kg",
+      "Curl Femoral — 2×12 @ 35-40kg"
+    ]},
+  {id:7, week:2, date:"2026-07-21", day:"Mar", title:"Escaladora: 4×4min fuerte / 2min suave", dur:"25 min", rpe:"7", notes:"El que más sube tu capacidad aeróbica"},
+  {id:8, week:2, date:"2026-07-23", day:"Jue", title:"Fuerza (tren superior) + cinta inclinada 15min", dur:"45 min", rpe:"6", notes:"",
+    exercises:[
+      "Remo Ancho Polea Alta — 3×10-15 @ 25kg",
+      "Remo Ancho Polea Baja — 3×10-15 @ 35kg",
+      "Press Inclinado Mancuerna — 3×10 @ 8-9kg",
+      "Empujes Pectoral (máquina) — 3×10 @ 8-9kg",
+      "Face Pulls — 2×15-20 @ 9-10kg",
+      "Cinta inclinada 12% — 15 min al final"
+    ]},
+
+  {id:9, week:3, date:"2026-07-25", day:"Sáb", title:"Cinta inclinada 15%, mochila 6kg", dur:"50 min", rpe:"7", notes:"Puedes partirlo en bloques de 15-20min", long:true},
+  {id:10, week:3, date:"2026-07-26", day:"Dom", title:"Fuerza ligera (baja volumen 20%)", dur:"35 min", rpe:"5", notes:"Prioriza piernas y core",
+    exercises:[
+      "Hip Thrust barra — 1×10 @ 60kg",
+      "Hip Thrust barra — 1×8 @ 55kg",
+      "Hip Thrust barra — 1×8 @ 50kg",
+      "Bulgarian Squat mancuerna — 2×8 @ 10kg",
+      "Abductores — 2×15 @ 100kg"
+    ]},
+  {id:11, week:3, date:"2026-07-28", day:"Mar", title:"Escaladora continua + equilibrio (un pie, step)", dur:"30 min", rpe:"6", notes:"Ayuda en bajadas técnicas"},
+  {id:12, week:3, date:"2026-07-30", day:"Jue", title:"Fuerza ligera + bici Z2", dur:"35 min", rpe:"5", notes:"",
+    exercises:[
+      "Romanian Deadlift — 2×10 @ 20-22kg",
+      "Curl Femoral — 2×12 @ 35kg",
+      "Patadas Glúteo (polea) — 2×12 @ 15-17kg",
+      "Bici Z2 — 10-15 min al final"
+    ]},
+
+  {id:13, week:4, date:"2026-08-01", day:"Sáb", title:"SIMULACRO 1: cinta + escaladora combinadas, mochila 8-10kg", dur:"70-80 min", rpe:"7-8", notes:"Prueba botas e hidratación como si fuera el día real", long:true, sim:true},
+  {id:14, week:4, date:"2026-08-02", day:"Dom", title:"Descanso activo / movilidad", dur:"20 min", rpe:"2", notes:"Piernas cansadas, tócalas suave"},
+  {id:15, week:4, date:"2026-08-04", day:"Mar", title:"Fuerza ligera", dur:"30 min", rpe:"5", notes:"Foco en mantenimiento, no en subir peso",
+    exercises:[
+      "Hip Thrust barra — 3×8 @ 55-60kg",
+      "Abductores — 2×15 @ 100kg",
+      "Face Pulls — 2×15 @ 9kg"
+    ]},
+  {id:16, week:4, date:"2026-08-06", day:"Jue", title:"Cardio suave (elíptica o bici)", dur:"25 min", rpe:"4", notes:""},
+
+  {id:17, week:5, date:"2026-08-08", day:"Sáb", title:"SIMULACRO 2: combinado cinta + escaladora, mochila 8-10kg", dur:"80-90 min", rpe:"7-8", notes:"El más exigente de todo el plan", long:true, sim:true},
+  {id:18, week:5, date:"2026-08-09", day:"Dom", title:"Descanso activo / movilidad", dur:"20 min", rpe:"2", notes:""},
+  {id:19, week:5, date:"2026-08-11", day:"Mar", title:"Fuerza ligera", dur:"30 min", rpe:"5", notes:"",
+    exercises:[
+      "Hip Thrust barra — 3×8 @ 60kg",
+      "Curl Femoral — 2×12 @ 35-40kg",
+      "Patadas Glúteo (polea) — 2×12 @ 17kg"
+    ]},
+  {id:20, week:5, date:"2026-08-13", day:"Jue", title:"Cardio corto suave", dur:"20 min", rpe:"4", notes:""},
+
+  {id:21, week:6, date:"2026-08-15", day:"Sáb", title:"Cardio suave, sin mochila", dur:"30 min", rpe:"4", notes:""},
+  {id:22, week:6, date:"2026-08-16", day:"Dom", title:"Fuerza muy ligera (activación)", dur:"20 min", rpe:"3", notes:"",
+    exercises:[
+      "Glute Bridge (peso corporal) — 2×15",
+      "Face Pulls (banda ligera) — 2×15",
+      "Movilidad de cadera — 5 min"
+    ]},
+  {id:23, week:6, date:"2026-08-18", day:"Mar", title:"Paseo o movilidad", dur:"15 min", rpe:"2", notes:"Prepara mochila y equipo"},
+  {id:24, week:6, date:"2026-08-20", day:"Jue", title:"Descanso total", dur:"-", rpe:"-", notes:"Prioriza sueño e hidratación"},
+];
+
+const weekDates = {
+  1:"11–17 jul", 2:"18–24 jul", 3:"25–31 jul", 4:"1–7 ago", 5:"8–14 ago", 6:"15–21 ago"
+};
+const weekNames = {
+  1:"Semana 1 · Reactivar cardio", 2:"Semana 2 · Sube volumen", 3:"Semana 3 · Pico",
+  4:"Semana 4 · Simulacro 1", 5:"Semana 5 · Simulacro 2", 6:"Semana 6 · Taper"
+};
+
+const equipItems = [
+  "Botas de trekking ya rodadas (nunca estrenar en la ruta)",
+  "Mochila de excursión, la misma que usaste en los simulacros",
+  "Bastones de trekking si habrá desnivel fuerte",
+  "Calcetines técnicos (evitar ampollas)",
+  "Sistema de hidratación (bolsa o cantimploras)",
+  "Capa cortavientos / impermeable ligera",
+  "Botiquín básico + tiritas para ampollas",
+  "Snacks probados en los simulacros, nada nuevo el día de la ruta"
+];
+
+let state = { completed: [], equip: [] };
+let openWeek = null;
+let expanded = new Set();
+
+function toggleExpand(id, evt){
+  if(evt) evt.stopPropagation();
+  if(expanded.has(id)) expanded.delete(id); else expanded.add(id);
+  render();
+}
+
+function exListHTML(s){
+  if(!s.exercises) return '';
+  if(!expanded.has(s.id)){
+    return `<div class="ex-toggle" onclick="toggleExpand(${s.id}, event)">▸ Ver ejercicios (${s.exercises.length})</div>`;
+  }
+  return `<div class="ex-toggle" onclick="toggleExpand(${s.id}, event)">▾ Ocultar ejercicios</div>
+    <div class="ex-list">${s.exercises.map(e=>`<div>· ${e}</div>`).join('')}</div>`;
+}
+
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.get('plan-progress');
+    if(res && res.value){ state = JSON.parse(res.value); }
+  }catch(e){ /* no hay datos guardados todavía */ }
+  render();
+}
+async function saveState(){
+  try{ await window.storage.set('plan-progress', JSON.stringify(state)); }
+  catch(e){ console.error('No se pudo guardar', e); }
+}
+
+function toggleSession(id){
+  const i = state.completed.indexOf(id);
+  if(i>-1) state.completed.splice(i,1); else state.completed.push(id);
+  saveState(); render();
+}
+function toggleEquip(idx){
+  const i = state.equip.indexOf(idx);
+  if(i>-1) state.equip.splice(i,1); else state.equip.push(idx);
+  saveState(); render();
+}
+
+function renderHeader(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const trip = new Date(TRIP_DATE+"T00:00:00");
+  const diff = Math.ceil((trip-today)/86400000);
+  document.getElementById('countdown-num').textContent = diff>=0 ? diff : 0;
+  document.getElementById('countdown-lbl').textContent = diff===1 ? 'día' : 'días';
+  const pct = Math.round((state.completed.length/sessions.length)*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-label').textContent = state.completed.length+' / '+sessions.length+' sesiones completadas';
+}
+
+function renderToday(){
+  const t = todayISO();
+  const slot = document.getElementById('today-slot');
+  const s = sessions.find(x=>x.date===t);
+  if(s){
+    const done = state.completed.includes(s.id);
+    slot.innerHTML = `
+      <div class="today-card ${done?'done':''}">
+        <div class="today-eyebrow">${s.sim?'Simulacro · ':''}Hoy · ${s.day}</div>
+        <div class="today-title">${s.title}</div>
+        <div class="today-meta">
+          <span class="meta-chip">⏱ ${s.dur}</span>
+          <span class="meta-chip">RPE ${s.rpe}</span>
+        </div>
+        ${s.notes?`<div class="today-notes">${s.notes}</div>`:''}
+        ${exListHTML(s)}
+        <button class="btn-done ${done?'on':''}" onclick="toggleSession(${s.id})" style="margin-top:14px">${done?'✓ Completado':'Marcar como hecho'}</button>
+      </div>`;
+  } else {
+    const next = sessions.find(x=>x.date>t);
+    slot.innerHTML = `
+      <div class="today-card rest">
+        <div class="today-eyebrow">Hoy</div>
+        <div class="today-title">Descanso</div>
+        <div class="today-notes">No toca entreno hoy. ${next?`<div class="next-preview">Próxima sesión: <b>${next.day}</b> — ${next.title}</div>`:''}</div>
+      </div>`;
+  }
+
+  const upcoming = sessions.filter(x=>x.date>=t).slice(0,4);
+  document.getElementById('upcoming-slot').innerHTML = upcoming.map(s=>{
+    const done = state.completed.includes(s.id);
+    return `
+    <div class="sess ${done?'done':''}" style="background:var(--white); border:1px solid var(--paper-dark); margin-bottom:8px;">
+      <div class="chk ${done?'on':''}" onclick="toggleSession(${s.id})"></div>
+      <div class="sess-info">
+        <div class="sess-day">${s.day} · ${formatDate(s.date)}</div>
+        <div class="sess-title">${s.title}</div>
+        <div class="sess-sub">${s.dur} · RPE ${s.rpe}</div>
+        ${exListHTML(s)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDate(iso){
+  const [y,m,d] = iso.split('-');
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return d+' '+meses[parseInt(m)-1];
+}
+
+function renderWeeks(){
+  const slot = document.getElementById('weeks-slot');
+  slot.innerHTML = [1,2,3,4,5,6].map(w=>{
+    const wsessions = sessions.filter(s=>s.week===w);
+    const count = wsessions.filter(s=>state.completed.includes(s.id)).length;
+    const isOpen = openWeek===w;
+    return `
+    <div class="week">
+      <div class="week-head" onclick="setOpenWeek(${w})">
+        <div>
+          <div class="wname">${weekNames[w]}</div>
+          <span class="wdates">${weekDates[w]}</span>
+        </div>
+        <span class="wcount">${count}/${wsessions.length}</span>
+      </div>
+      <div class="week-body ${isOpen?'open':''}">
+        ${wsessions.map(s=>{
+          const done = state.completed.includes(s.id);
+          return `
+          <div class="sess ${done?'done':''}">
+            <div class="chk ${done?'on':''}" onclick="toggleSession(${s.id})"></div>
+            <div class="sess-info">
+              <div class="sess-day">${s.day} · ${formatDate(s.date)}</div>
+              <div class="sess-title">${s.title}</div>
+              <div class="sess-sub">${s.dur} · RPE ${s.rpe}${s.notes?' · '+s.notes:''}</div>
+              ${exListHTML(s)}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setOpenWeek(w){
+  openWeek = openWeek===w ? null : w;
+  renderWeeks();
+}
+
+function renderEquip(){
+  const slot = document.getElementById('equip-slot');
+  slot.innerHTML = equipItems.map((txt,idx)=>{
+    const done = state.equip.includes(idx);
+    return `
+    <div class="equip-item ${done?'done':''}">
+      <div class="chk ${done?'on':''}" onclick="toggleEquip(${idx})"></div>
+      <div class="txt">${txt}</div>
+    </div>`;
+  }).join('');
+}
+
+function render(){
+  renderHeader();
+  renderToday();
+  renderWeeks();
+  renderEquip();
+}
+
+document.querySelectorAll('nav.tabbar button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+// Abrir automáticamente la semana actual en la vista Plan
+const t0 = todayISO();
+const currentSession = sessions.find(s=>s.date>=t0);
+if(currentSession) openWeek = currentSession.week; else openWeek = 6;
+
+// Registrar Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').catch(err=>console.log('SW registration failed:', err));
+}
+
+loadState();
+</script>
+</body>
+</html>
